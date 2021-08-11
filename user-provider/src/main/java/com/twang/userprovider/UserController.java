@@ -2,6 +2,7 @@ package com.twang.userprovider;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,14 @@ public class UserController {
     @GetMapping(value = "/")
     public String index() {
         return "This message is from user provider. Token is : " + RandomStringUtils.randomAlphabetic(20);
+    }
+
+    @Autowired
+    private Environment environment;
+
+    @GetMapping(value = "/springEnv/{name}")
+    public String index(@PathVariable String name) {
+        return name + " --> " + environment.getProperty(name);
     }
 
     @Autowired

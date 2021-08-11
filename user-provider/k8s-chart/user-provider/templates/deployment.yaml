@@ -35,6 +35,13 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- toYaml .Values.appEnv | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: user-provider-cm
+          volumeMounts:
+            - name: config-from-pv
+              mountPath: "/my-config"
+              readOnly: true
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
@@ -49,6 +56,18 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      # You set volumes at the Pod level, then mount them into containers inside that Pod
+      - name: config-from-pv
+        configMap:
+          # Provide the name of the ConfigMap you want to mount.
+          name: user-provider-cm
+          # An array of keys from the ConfigMap to create as files
+      #   items:
+      #     - key: "game.properties"
+      #       path: "game.properties"
+      #     - key: "user-interface.properties"
+      #       path: "user-interface.properties"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
