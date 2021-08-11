@@ -9,7 +9,10 @@ appEnv:
   - name: spring.datasource.password
     value: mmmGxaBrfI
   - name: spring.datasource.url
-    value: jdbc:mysql://mysql/test?createDatabaseIfNotExist=true
+    # 三种配置都可以
+#    value: jdbc:mysql://mysql/test?createDatabaseIfNotExist=true
+#    value: jdbc:mysql://mysql-headless/test?createDatabaseIfNotExist=true
+    value: jdbc:mysql://mysql.default.svc.cluster.local/test?createDatabaseIfNotExist=true
 
 image:
   repository: velkoz/jpa-provider

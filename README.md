@@ -30,6 +30,15 @@ Password : mmmGxaBrfI
 ```
 `mysql`就是k8s中mysql的svc名字
 
+或者
+```shell
+# spring.datasource.url=jdbc:mysql://mysql-headless/test?createDatabaseIfNotExist=true
+```
+或者
+```shell
+# spring.datasource.url=jdbc:mysql://mysql.default.svc.cluster.local/test?createDatabaseIfNotExist=true
+```
+
 ```
 $ kubectl get svc
 NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
@@ -37,5 +46,13 @@ mysql            ClusterIP   10.96.196.252   <none>        3306/TCP       19h
 mysql-headless   ClusterIP   None            <none>        3306/TCP       19h
 ```
 
-TODO
-可以研究一下`mysql-headless`的svc的使用
+`mysql-headless`的svc的会有一个内网域名，如：`mysql.default.svc.cluster.local`
+进入集群中一个含有mysql客户端的容器内部，使用命令行方式访问mysql.
+也可以创建一个临时的容器:
+```shell
+# kubectl run mysql-client --rm --tty -i --restart='Never' --image  docker.io/bitnami/mysql:8.0.26-debian-10-r10 --namespace default --command -- bash
+```
+登录mysql
+```shell
+# mysql -h mysql.default.svc.cluster.local -uroot -p test
+```
