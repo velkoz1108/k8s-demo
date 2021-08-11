@@ -56,3 +56,61 @@ mysql-headless   ClusterIP   None            <none>        3306/TCP       19h
 ```shell
 # mysql -h mysql.default.svc.cluster.local -uroot -p test
 ```
+
+4. 通过secret来配置mysql的密码
+    查看mysql的`secret`:
+```shell
+$ kubectl get secret mysql
+NAME    TYPE     DATA   AGE
+mysql   Opaque   2      40h
+```
+获取密码的key
+```shell
+$ kubectl describe secret mysql
+Name:         mysql
+Namespace:    default
+Labels:       app.kubernetes.io/instance=mysql
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=mysql
+              helm.sh/chart=mysql-8.8.2
+Annotations:  meta.helm.sh/release-name: mysql
+              meta.helm.sh/release-namespace: default
+
+Type:  Opaque
+
+Data
+====
+mysql-root-password:  10 bytes
+mysql-password:       10 bytes
+
+```
+`mysql-root-password`的值就是mysql的root用户的密码
+
+修改原来的账号密码配置：
+```yaml
+appEnv:
+#  - name: spring.datasource.password
+#    value: mmmGxaBrfI
+  - name: spring.datasource.password
+    valueFrom:
+      secretKeyRef:
+        name: mysql
+        key: mysql-root-password
+```
+查看pod的env参数:
+```shell
+...
+    Restart Count:  0
+    Liveness:       http-get http://:http/ delay=0s timeout=1s period=10s #success=1 #failure=3
+    Readiness:      http-get http://:http/ delay=0s timeout=1s period=10s #success=1 #failure=3
+    Startup:        http-get http://:http/ delay=0s timeout=2s period=30s #success=1 #failure=50
+    Environment:
+      spring.datasource.password:  <set to the key 'mysql-root-password' in secret 'mysql'>  Optional: false
+      spring.datasource.url:       jdbc:mysql://mysql.default.svc.cluster.local/test?createDatabaseIfNotExist=true
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-ptbkh (ro)
+
+...
+```
+密码显示为：`<set to the key 'mysql-root-password' in secret 'mysql'>  Optional: false`
+

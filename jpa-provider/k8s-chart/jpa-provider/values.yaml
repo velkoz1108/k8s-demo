@@ -6,8 +6,13 @@ replicaCount: 1
 containerPort: 8083
 
 appEnv:
+#  - name: spring.datasource.password
+#    value: mmmGxaBrfI
   - name: spring.datasource.password
-    value: mmmGxaBrfI
+    valueFrom:
+      secretKeyRef:
+        name: mysql
+        key: mysql-root-password
   - name: spring.datasource.url
     # 三种配置都可以
 #    value: jdbc:mysql://mysql/test?createDatabaseIfNotExist=true
