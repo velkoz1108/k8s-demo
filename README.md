@@ -113,4 +113,10 @@ appEnv:
 ...
 ```
 密码显示为：`<set to the key 'mysql-root-password' in secret 'mysql'>  Optional: false`
+但是可以进入容器内通过`env`命令查看原始密码：
+```shell
+# env | grep spring
+spring.datasource.password=mmmGxaBrfI
+spring.datasource.url=jdbc:mysql://mysql.default.svc.cluster.local/test?createDatabaseIfNotExist=true
+```
 
